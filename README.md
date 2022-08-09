@@ -21,7 +21,7 @@ in the constructor when creating a Redimension object.
 An example usage in 2D is the following. Imagine you want to index persons
 by salary and age:
 
-    myindex = new Redimension(redis_client, "people-by-salary", 2, 64)
+    myindex = NewRedimension(redisCli, 2, 64)
 
 We created a Redimension object specifying a Redis object that must respond
 to the Redis commands. We specified we want 2D indexing, and 64 bits of
