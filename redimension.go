@@ -47,7 +47,6 @@ func (s *Redimension) encode(vars []uint32) string {
 		if s.prec-len(vbin) > 0 {
 			vbin = fmt.Sprintf("%s%s", strings.Repeat("0", s.prec-len(vbin)), vbin)
 		}
-		//fmt.Println(vbin)
 		for i, b := range []byte(vbin) {
 			comb[i][j] = b
 		}
@@ -63,7 +62,6 @@ func (s *Redimension) encode(vars []uint32) string {
 	x := big.Int{}
 	x.SetString(string(resBytes), 10)
 	res := x.Text(16)
-	fmt.Println(res)
 	if s.prec*s.dim/4-len(res) > 0 {
 		res = fmt.Sprintf("%s%s", strings.Repeat("0", s.prec*s.dim/4-len(res)), res)
 	}
@@ -264,7 +262,6 @@ func (s *Redimension) queryRaw(zkey string, vrange [][]uint32, exp int) ([]*sIte
 		// Increment to loop in N dimensions in order to visit
 		// all the sub-areas representing the N dimensional area to
 		// query.
-		fmt.Printf("Lex query: %v\n", ranges[len(ranges)-1])
 		for i := 0; i < s.dim; i++ {
 			if vcurrent[i] != vend[i] {
 				vcurrent[i] += 1
@@ -281,6 +278,7 @@ func (s *Redimension) queryRaw(zkey string, vrange [][]uint32, exp int) ([]*sIte
 	// Perform the ZRANGEBYLEX queries to collect the results from the
 	// defined ranges. Use pipelining to speedup.
 	for _, v := range ranges {
+		fmt.Printf("Lex query: %v\n", v)
 		_ = s.conn.Send("zrangebylex", zkey, v[0], v[1])
 	}
 	if err := s.conn.Flush(); err != nil {
@@ -303,7 +301,7 @@ func (s *Redimension) queryRaw(zkey string, vrange [][]uint32, exp int) ([]*sIte
 			if !skip {
 				items = append(items, &sItem{
 					ID:  fields[len(fields)-1],
-					Pos: fields[1 : len(fields)-2],
+					Pos: fields[1 : len(fields)-1],
 				})
 			}
 		}
