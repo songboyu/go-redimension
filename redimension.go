@@ -278,16 +278,19 @@ func (s *Redimension) queryRaw(zkey string, vrange [][]uint32, exp int) ([]*sIte
 	// Perform the ZRANGEBYLEX queries to collect the results from the
 	// defined ranges. Use pipelining to speedup.
 	for _, v := range ranges {
-		fmt.Printf("Lex query: %v\n", v)
 		_ = s.conn.Send("zrangebylex", zkey, v[0], v[1])
 	}
 	if err := s.conn.Flush(); err != nil {
 		return nil, err
 	}
 	var items []*sItem
-	for range ranges {
-		res, _ := redis.Strings(s.conn.Receive())
-		fmt.Printf("res: %v\n", res)
+	for _, v := range ranges {
+		res, err := redis.Strings(s.conn.Receive())
+		fmt.Printf("----query: %v\nres: %v\n", v, res)
+		if err != nil {
+			fmt.Printf("lex query err: %v", err)
+			continue
+		}
 		for _, item := range res {
 			fields := strings.Split(item, ":")
 			skip := false
